@@ -134,7 +134,39 @@ SELECT * FROM Q4;
 
 
 /* University 03 */
-CREATE VIEW Q5 AS
-  /* Your answer here */
-
+CREATE VIEW Q5 AS (
+  WITH level0 AS (
+    SELECT code FROM (
+      SELECT code 
+      FROM modules
+      EXCEPT
+      SELECT code 
+      FROM prereqs
+    ) AS s   
+  )
+  SELECT code, 0 AS level 
+  FROM level0
+  
+  UNION
+  
+  SELECT code, 1 AS level 
+  FROM (
+    SELECT code 
+    FROM modules
+    EXCEPT
+    SELECT code FROM (
+      SELECT code
+      FROM prereqs
+      WHERE 
+        need NOT IN 
+        (
+          SELECT code 
+          FROM level0
+        ) 
+      UNION
+      SELECT code 
+      FROM level0
+    ) AS s1
+  ) AS s2
+);
 SELECT * FROM Q5;
