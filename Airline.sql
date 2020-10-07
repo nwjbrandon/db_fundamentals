@@ -72,14 +72,41 @@ CREATE VIEW Q1(flight, connecting) AS (
   WHERE 
   	F1.src='ICN' AND
   	F2.dst='CGK' AND
-  	F1.dst=F2.src
+  	F1.dst=F2.src 
 );
 SELECT * FROM Q1;
 
 
 
 /* Airline 02 */
-CREATE VIEW Q2 AS
-  /* Your answer here */
-
+CREATE VIEW Q2 AS (
+  WITH flight_info AS (
+    SELECT num, src, dst, depart, cost
+    FROM flights NATURAL JOIN scheds
+  )
+  SELECT 
+    num AS flight, 
+    depart AS flight_date, 
+    NULL AS connecting, 
+    NULL AS connecting_date,
+    cost AS cost 
+  FROM flight_info
+  WHERE 
+    src='ICN' AND
+    dst='CGK'
+  UNION
+  SELECT 
+    F1.num AS flight, 
+    F1.depart AS flight_date, 
+    F2.num AS connecting, 
+    F2.depart AS connecting_date,
+    F1.cost + F2.cost AS cost 
+  FROM flight_info F1, flight_info F2
+  WHERE 
+    F1.src='ICN' AND
+    F2.dst='CGK' AND
+    date(F2.depart) - date(F1.depart) <= 2 AND
+    date(F2.depart) >= date(F1.depart)
+  ORDER BY cost
+);
 SELECT * FROM Q2;
