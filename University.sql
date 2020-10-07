@@ -134,7 +134,22 @@ SELECT * FROM Q4;
 
 
 /* University 03 */
-CREATE VIEW Q5 AS
-  /* Your answer here */
-
+CREATE VIEW Q5 AS (
+  WITH RECURSIVE leveln AS (
+    -- Anchor
+    SELECT code, need 
+    FROM prereqs
+    WHERE code='CS4221'
+    
+    UNION ALL
+    
+    -- Recursive Member
+    SELECT prereqs.code, prereqs.need
+    FROM prereqs
+    JOIN leveln
+    ON prereqs.code = leveln.need
+  )
+  
+  SELECT DISTINCT need FROM leveln
+);
 SELECT * FROM Q5;
