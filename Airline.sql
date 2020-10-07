@@ -106,7 +106,8 @@ CREATE VIEW Q2 AS (
     F1.src='ICN' AND
     F2.dst='CGK' AND
     date(F2.depart) - date(F1.depart) <= 2 AND
-    date(F2.depart) >= date(F1.depart)
+    date(F2.depart) >= date(F1.depart) AND
+    F1.dst=F2.src
   ORDER BY cost
 );
 SELECT * FROM Q2;
