@@ -153,3 +153,81 @@ CREATE VIEW Q5 AS (
   SELECT DISTINCT need FROM leveln
 );
 SELECT * FROM Q5;
+
+
+
+/* University 03 */
+CREATE VIEW Q5 AS (
+  WITH full_prereqs AS (
+    SELECT 
+      u.p1code AS p1code, 
+      u.p1need AS p1need, 
+      u.p2code AS p2code, 
+      u.p2need AS p2need, 
+      u.p3code AS p3code, 
+      u.p3need AS p3need,
+      u.p4code AS p4code,
+      u.p4need AS p4need,
+      p5.code AS p5code,
+      p5.need AS p5need
+    FROM
+      (
+      SELECT 
+        t.p1code AS p1code, 
+        t.p1need AS p1need, 
+        t.p2code AS p2code, 
+        t.p2need AS p2need, 
+        t.p3code AS p3code, 
+        t.p3need AS p3need,
+        p4.code AS p4code,
+        p4.need AS p4need
+      FROM 
+        (
+          SELECT 
+          s.p1code AS p1code, 
+          s.p1need AS p1need, 
+          s.p2code AS p2code, 
+          s.p2need AS p2need, 
+          p3.code AS p3code, 
+          p3.need AS p3need 
+        FROM
+          (
+            SELECT 
+              p1.code AS p1code, 
+              p1.need AS p1need, 
+              p2.code AS p2code, 
+              p2.need AS p2need 
+            FROM prereqs p1 
+            LEFT JOIN prereqs p2 
+            ON 
+              p1.need=p2.code 
+            WHERE
+              p1.code='CS4221'
+          ) AS s 
+        LEFT JOIN prereqs p3
+        ON
+          s.p2need=p3.code
+        ) AS t
+      LEFT JOIN prereqs p4
+      ON
+        t.p3need=p4.code
+      ) AS u
+    LEFT JOIN prereqs p5
+    ON 
+      u.p4need=p5.code
+    
+  )
+  SELECT * FROM (
+    SELECT p1need AS need FROM full_prereqs
+    UNION
+    SELECT p2need AS need FROM full_prereqs
+    UNION
+    SELECT p3need AS need FROM full_prereqs
+    UNION
+    SELECT p4need AS need FROM full_prereqs
+    UNION
+    SELECT p5need AS need FROM full_prereqs
+  ) as v 
+  WHERE need IS NOT NULL
+);
+SELECT * FROM Q5;
